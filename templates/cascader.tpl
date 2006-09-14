@@ -1,8 +1,9 @@
+{* feel free to replace all this shoddy js *}
 <script type="text/javascript">
 	/* <![CDATA[ */
 	{literal}
 	function insertText( text ) {
-		var id = getCheckedRadio($('cascaderForm').elements['rad']);
+		var id = getCheckedRadio($('picker').elements['rad']);
 		$('text_'+id).value = text;
 	}
 
@@ -43,6 +44,15 @@
 
 		{formfeedback hash=$feedback}
 
+		{if $style != 'cascader'}
+			{form}
+				<p>You are currently not using the cascader style. If you don't get the desired effects when applying a new color style, please switch to the cascader site style.</p>
+				<div class="row submit">
+					<input type="submit" name="cascader_style" value="Apply Cascader Style" />
+				</div>
+			{/form}
+		{/if}
+
 		{jstabs}
 			{jstab title="Color Selector"}
 				<h2>{tr}Generic Page Layout{/tr}</h2>
@@ -67,35 +77,40 @@
 					<div id="preview_footer"> #footer </div>
 				</div>
 
-				<p>
-					Currently only 10 - 13th of september are working in the calendar
-				</p>
+				<p>Currently only 10 - 13th of september are working in the calendar</p>
 				{$calendar}
 
 				{if $cssList}
-				<h2>{tr}List of already stored Schemes{/tr}</h2>
-					<ul class="data">
-						{foreach key=name item=file from=$cssList}
-							<li calss="{cycle values="odd,even"}">
-								{if $file.url == $gBitSystem->getConfig('cascader_style')}
-									{biticon ipackage="icons" iname="dialog-ok" iexplain="Active Scheme"}
-								{/if}
-								<a href="{$smarty.const.CASCADER_PKG_URL}index.php?apply_style={$name}">{$name}</a>
-								<a href="{$file.url}">{biticon ipackage=icons iname="edit-find" iexplain="View Source"}</a>
-								<a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{biticon ipackage=icons iname="edit-delete" iexplain="Remove File"}</a>
-							</li>
-						{/foreach}
-					</ul>
+					{form legend="List of already stored Schemes"}
+						<ul class="data">
+							{foreach key=name item=file from=$cssList}
+								<li calss="{cycle values="odd,even"}">
+									{if $file.url == $gBitSystem->getConfig('cascader_style')}
+										{biticon ipackage="icons" iname="dialog-ok" iexplain="Active Scheme"}
+									{else}
+										{biticon ipackage="liberty" iname="spacer" iexplain="Active Scheme"}
+									{/if}
+									<a href="{$smarty.const.CASCADER_PKG_URL}index.php?apply_style={$name}">{$name}</a>
+									<a href="{$file.url}">{biticon ipackage=icons iname="edit-find" iexplain="View Source"}</a>
+									<a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{biticon ipackage=icons iname="edit-delete" iexplain="Remove File"}</a>
+								</li>
+							{/foreach}
+						</ul>
+
+						<div class="row submit">
+							<input type="submit" name="clear_all_styles" value="{tr}Remove all schemes{/tr}" />
+						</div>
+					{/form}
 				{/if}
 
 				{if $colorScheme}
-					{form id=cascaderForm}
+					{form legend="Pick your site colors" id=picker}
 						<input type="hidden" name="color_scheme" value="{$smarty.request.color_scheme}" />
 
 						<h2>Color Scheme name</h2>
 						<p> Please select a CSS property and then apply a color to it </p>
 
-						<table>
+						<table class="layout">
 							<caption>{tr}Color Picker{/tr}</caption>
 							<tr>
 								<th style="width:50%">{tr}CSS Selector{/tr}</th>
@@ -104,13 +119,13 @@
 							<tr>
 								<td>
 									<ul class="idpicker">
-										{foreach key=id from=$cascaderIds item=css_def}
-										<li>
-											<label>
-												{$css_def} <input type="radio" id="_{$id}" value="{$id}" name="rad"/>
-												<input type="text" size="10" id="text_{$id}" name="cascader[{$id}]" value="{$smarty.request.cascader.$id}" />
-											</label>
-										</li>
+										{foreach key=id from=$properties item=property}
+											<li>
+												<label>
+													{$property.title} <input type="radio" id="_{$id}" value="{$id}" name="rad"/>
+													<input type="text" size="10" id="text_{$id}" name="cascader[{$id}]" value="{$smarty.request.cascader.$id}" />
+												</label>
+											</li>
 										{/foreach}
 									</ul>
 								</td>

@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.1 2006/09/13 20:07:55 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.2 2006/09/14 09:50:17 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.1 $
+ * @version:      $Revision: 1.2 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -18,6 +18,11 @@ require_once( CASCADER_PKG_PATH.'Calendar.php' );
  */
 class Cascader extends Calendar {
 	/**
+	 * Scheme Title
+	 */
+	var $mTitle;
+
+	/**
 	 * Initiate class
 	 *
 	 * @param $pContentId content id of the treasury - use either one of the ids.
@@ -25,7 +30,8 @@ class Cascader extends Calendar {
 	 * @return none
 	 * @access public
 	 **/
-	function Cascader() {
+	function Cascader( $pTitle = NULL ) {
+		$this->mTitle = $pTitle;
 	}
 
 	/**
@@ -38,7 +44,7 @@ class Cascader extends Calendar {
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
 	function getDateLink( $day, $month, $year ) {
-		return CASCADER_PKG_URL."index.php?color_scheme=$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT );
+		return CASCADER_PKG_URL."index.php?color_scheme=$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT )."#picker";
 	}
 
 	/**
@@ -104,20 +110,31 @@ class Cascader extends Calendar {
 	 * @access public
 	 * @return CSS as a string
 	 */
-	function createCss( $pColorHash, $pKeys ) {
+	function createCss( $pColorSettings, $pKeys ) {
 		$ret = '';
-		if( is_array( $pColorHash ) ) {
-			foreach( $pColorHash as $id => $value ) {
+		if( is_array( $pColorSettings ) ) {
+			foreach( $pColorSettings as $id => $value ) {
 				if( !empty( $value ) ) {
-					if( $id == 'font' ) {
-						$ret .= "body {color:$value;}\n";
-					} else {
-						$ret .= "{$pKeys[$id]} {background:$value;}\n";
-					}
+					$ret .= $pKeys[$id]['selector']." {".$pKeys[$id]['property'].":$value;}\n";
 				}
 			}
 		}
 		return $ret;
+	}
+
+	/**
+	 * Create a header for the css file
+	 * 
+	 * @param array $pSchemeHash Scheme information including color set and title
+	 * @access public
+	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 */
+	function createHeader( $pColorHash = NULL ) {
+		global $gBitSmarty;
+		$scheme['title'] = $this->mTitle;
+		$scheme['colors'] = $pColorHash;
+		$gBitSmarty->assign( 'scheme', $scheme );
+		return $gBitSmarty->fetch( 'bitpackage:cascader/css_header.tpl' );
 	}
 
 	/**
@@ -138,21 +155,6 @@ class Cascader extends Calendar {
 			fclose( $fh );
 			return BIT_ROOT_URL.$branch.$pStyleName;
 		}
-	}
-
-	/**
-	 * Fetch a specific css file
-	 * 
-	 * @param array $pStyleName 
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
-	 */
-	function fetchCss( $pStyleName ) {
-		$path = LibertyAttachable::getStoragePath();
-		if( is_file( $path.$pStyleName ) ) {
-			return( $path.$pStyleName );
-		}
-		return FALSE;
 	}
 
 	/**
