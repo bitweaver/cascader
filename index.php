@@ -1,4 +1,5 @@
 <?php
+// Initial setup
 require_once( '../bit_setup_inc.php' );
 require_once( CASCADER_PKG_PATH.'Cascader.php' );
 
@@ -8,98 +9,42 @@ $gBitSystem->verifyPermission( 'p_admin' );
 // make sure the package is active
 $gBitSystem->verifyPackage( 'cascader' );
 
+// This is appended to the css file link ensuring an up to date view on ever page load
+$gBitSmarty->assign( 'refresh', '?refresh='.time() );
+
+// array used to feedback information to the user
+$feedback = array();
+
+
 // We need to use the cascader style for this package
 if( !empty( $_REQUEST['cascader_style'] ) ) {
 	$gBitSystem->storeConfig( 'style', 'cascader', THEMES_PKG_NAME );
 	$gPreviewStyle = 'cascader';
 }
 
-// This is appended to the css file link ensuring an up to date view on ever page load
-$gBitSmarty->assign( 'refresh', '?refresh='.time() );
-
-$feedback = array();
-$gCascader = new Cascader( 'Scheme Name' );
-
 // apply the style layout
+$styleLayouts = $gBitThemes->getStyleLayouts();
+$gBitSmarty->assign_by_ref( "styleLayouts", $styleLayouts );
+
 if( !empty( $_REQUEST["site_style_layout"] ) ) {
 	$gBitSystem->storeConfig( 'site_style_layout', ( ( $_REQUEST["site_style_layout"] != 'remove' ) ? $_REQUEST["site_style_layout"] : NULL ), THEMES_PKG_NAME );
 }
 
-$styleLayouts = $gBitThemes->getStyleLayouts();
-$gBitSmarty->assign_by_ref( "styleLayouts", $styleLayouts );
 
-// list of availabe properties that can be set
-// array key needs to be unique using only [A-Za-z_]
-$properties = array(
-	"body" => array(
-		"title" => "Body background",
-		"selector" => "body",
-		"property" => "background-color"
-	),
-	"font" => array(
-		"title" => "Font color",
-		"selector" => "body",
-		"property" => "color"
-	),
-	"link" => array(
-		"title" => "Link color",
-		"selector" => ":link,:visited",
-		"property" => "color"
-	),
-	"linkh" => array(
-		"title" => "Link hover background",
-		"selector" => ":link:hover,:visited:hover",
-		"property" => "background-color"
-	),
-	"container" => array(
-		"title" => "#container",
-		"selector" => "#container",
-		"property" => "background-color"
-	),
-	"header" => array(
-		"title" => "#header",
-		"selector" => "#header",
-		"property" => "background-color"
-	),
-	"wrapper" => array(
-		"title" => "#wrapper",
-		"selector" => "#wrapper",
-		"property" => "background-color"
-	),
-	"content" => array(
-		"title" => "#content",
-		"selector" => "#content",
-		"property" => "background-color"
-	),
-	"navigation" => array(
-		"title" => "#navigation",
-		"selector" => "#navigation",
-		"property" => "background-color"
-	),
-	"extra" => array(
-		"title" => "#extra",
-		"selector" => "#extra",
-		"property" => "background-color"
-	),
-	"footer" => array(
-		"title" => "#footer",
-		"selector" => "#footer",
-		"property" => "background-color"
-	),
-	"module" => array(
-		"title" => ".module",
-		"selector" => ".module",
-		"property" => "background-color"
-	),
-);
-$gBitSmarty->assign( 'properties', $properties );
-
-// this will fetch the color scheme from the server
-if( !empty( $_REQUEST['color_scheme'] ) ) {
-	if( $colorScheme = $gCascader->fetchScheme( '/dcs/'.$_REQUEST['color_scheme'] ) ) {
-		$gBitSmarty->assign( 'colorScheme', $colorScheme );
-	}
+// set the remoteId
+if( !empty( $_REQUEST['scheme'] ) ) {
+	$remoteId = '/dcs/'.$_REQUEST['scheme'];
+} else {
+	$remoteId = NULL;
 }
+$gCascader = new Cascader( $remoteId );
+$gCascader->load();
+
+// Make sure gCascader is avalable in the templates as well
+$gBitSmarty->assign_by_ref( 'gCascader', $gCascader );
+
+
+// Process form requests
 
 // Remove all scheme files
 if( !empty( $_REQUEST['clear_all_styles'] ) ) {
@@ -109,20 +54,10 @@ if( !empty( $_REQUEST['clear_all_styles'] ) ) {
 
 // create a css file based on the user specifications
 if( !empty( $_REQUEST['create_style'] ) ) {
-	$cascaderCss  = $gCascader->createHeader( $colorScheme );
-	$cascaderCss .= $gCascader->createCss( $_REQUEST['cascader'], $properties );
+	$cascaderCss  = $gCascader->createHeader();
+	$cascaderCss .= $gCascader->createCss( $_REQUEST['cascader'] );
 
-	// TODO: need the style name to insert here.
-	//if( $cssUrl = $gCascader->writeCss( str_replace( "/", "", $_REQUEST['color_scheme'] ).date( "-Ymd-His" ).'.css', $cascaderCss ) ) {
-
-	// We need to work out what name to use
-	$storefile = str_replace( "/", "", $_REQUEST['color_scheme'] );
-	$schemeFiles = array();
-	$cssList = $gCascader->getList();
-
-	$storefile .= '-'.str_replace( " ", "_", $gCascader->mTitle ).'.css';
-
-	if( $cssUrl = $gCascader->writeCss( $storefile, $cascaderCss ) ) {
+	if( $cssUrl = $gCascader->writeCss( $cascaderCss ) ) {
 		$feedback['success'] = tra( "The css file was stored to" ).": ".$cssUrl;
 	} else {
 		$feedback['error'] = tra( "There was a problem storing your custom css file." );

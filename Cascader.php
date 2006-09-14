@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.2 2006/09/14 09:50:17 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.3 2006/09/14 18:06:12 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.2 $
+ * @version:      $Revision: 1.3 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -23,6 +23,21 @@ class Cascader extends Calendar {
 	var $mTitle;
 
 	/**
+	 * This is the unique path on the remote server
+	 */
+	var $mRemotePath;
+
+	/**
+	 * Unique ID for this sheme
+	 */
+	var $mCascaderId;
+
+	/**
+	 * Information about this scheme
+	 */
+	var $mInfo = array();
+
+	/**
 	 * Initiate class
 	 *
 	 * @param $pContentId content id of the treasury - use either one of the ids.
@@ -30,54 +45,51 @@ class Cascader extends Calendar {
 	 * @return none
 	 * @access public
 	 **/
-	function Cascader( $pTitle = NULL ) {
-		$this->mTitle = $pTitle;
+	function Cascader( $pRemotePath = NULL ) {
+		// this string is likely to be messed up. lets turn it into something nice
+		if( !empty( $pRemotePath ) ) {
+			preg_match( "#(/[\d]+)*$#", $pRemotePath, $match );
+			$id = str_replace( "/", "", $match[0] );
+		} else {
+			$id = 0;
+		}
+		$this->mCascaderId = $id;
+		$this->mRemotePath = $pRemotePath;
 	}
 
 	/**
-	 * Provide our own day link
+	 * Load the color scheme
 	 * 
-	 * @param array $day 
-	 * @param array $month 
-	 * @param array $year 
+	 * @param array $pRemotePath Remote path to daily color scheme e.g.: 2006/04/28
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
-	function getDateLink( $day, $month, $year ) {
-		return CASCADER_PKG_URL."index.php?color_scheme=$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT )."#picker";
-	}
-
-	/**
-	 * Allow for monthly navigation
-	 * 
-	 * @param array $month 
-	 * @param array $year 
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
-	 */
-	function getCalendarLink( $month, $year ) {
-		return CASCADER_PKG_URL."index.php?month=$month&year=$year";
-	}
-
-	/**
-	 * fetch the color scheme
-	 * 
-	 * @param array $pRemoteFile 
-	 * @access public
-	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
-	 */
-	function fetchScheme( $pRemoteFile ) {
-		$ret = FALSE;
-		if( $ret = BitSystem::fetchRemoteFile( 'xing.hopto.org', $pRemoteFile ) ) {
-			if( preg_match( "/not found/i", $ret ) ) {
-				$ret = FALSE;
-			} else {
-				$ret = explode( ' ', trim( $ret ) );
-				$ret[] = "#000000";
-				$ret[] = "#FFFFFF";
+	function load() {
+		$scheme = array();
+		if( $this->isValid() && $scheme = BitSystem::fetchRemoteFile( 'xing.hopto.org', $this->mRemotePath ) ) {
+			if( !preg_match( "/not found/i", $scheme ) ) {
+				$scheme = explode( ' ', trim( $scheme ) );
+				$scheme[] = "#000000";
+				$scheme[] = "#FFFFFF";
 			}
 		}
-		return $ret;
+		$this->mTitle = "Scheme Name";
+		$this->mInfo['scheme'] = $scheme;
+		$this->mInfo['title'] = $this->mTitle;
+		$this->loadProperties();
+		return( count( $scheme ) );
+	}
+
+	/**
+	 * Load Properties 
+	 * 
+	 * @access public
+	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 */
+	function loadProperties() {
+		// properties are kept in a seperate file to maintain readability
+		require_once( CASCADER_PKG_PATH.'properties.php' );
+		$this->mInfo['properties'] = $properties;
 	}
 
 	/**
@@ -105,17 +117,21 @@ class Cascader extends Calendar {
 	/**
 	 * Create a valid css file based on a set of colors and the appropriate ids
 	 * 
-	 * @param array $pColorHash Set of colors where the keys need to match the keys of the $pKeys hash
-	 * @param array $pKeys Set of CSS IDs and Classes where the keys need to match the keys in $pColorHash
+	 * @param array $pColorHash Set of colors
 	 * @access public
 	 * @return CSS as a string
 	 */
-	function createCss( $pColorSettings, $pKeys ) {
+	function createCss( $pColorSettings ) {
 		$ret = '';
+		if( empty( $this->mInfo['properties'] ) ) {
+			$this->loadProperties();
+		}
+		$props = $this->mInfo['properties'];
+
 		if( is_array( $pColorSettings ) ) {
 			foreach( $pColorSettings as $id => $value ) {
 				if( !empty( $value ) ) {
-					$ret .= $pKeys[$id]['selector']." {".$pKeys[$id]['property'].":$value;}\n";
+					$ret .= $props[$id]['selector']." {\n\t".$props[$id]['property'].": $value !important;\n}\n";
 				}
 			}
 		}
@@ -145,15 +161,14 @@ class Cascader extends Calendar {
 	 * @access public
 	 * @return the URL to the file just stored - ready for linking
 	 */
-	function writeCss( $pStyleName = NULL, $pString = NULL ) {
-		if( !empty( $pString ) && $branch = LibertyAttachable::getStorageBranch() ) {
-			if( empty( $pStyleName ) ) {
-				$pStyleName = 'temp.css';
-			}
-			$fh = fopen( BIT_ROOT_PATH.$branch.$pStyleName, 'w' );
+	function writeCss( $pString = NULL ) {
+		if( $this->isValid() && !empty( $pString ) && $branch = LibertyAttachable::getStorageBranch() ) {
+			// We need to work out what name to use
+			$storefile = $this->mCascaderId.'-'.str_replace( " ", "_", $this->mTitle ).'.css';
+			$fh = fopen( BIT_ROOT_PATH.$branch.$storefile, 'w' );
 			fwrite( $fh, $pString );
 			fclose( $fh );
-			return BIT_ROOT_URL.$branch.$pStyleName;
+			return BIT_ROOT_URL.$branch.$storefile;
 		}
 	}
 
@@ -171,6 +186,42 @@ class Cascader extends Calendar {
 			return TRUE;
 		}
 		return FALSE;
+	}
+
+	/**
+	 * Check if class is valid
+	 * 
+	 * @access public
+	 * @return TRUE on success, FALSE on failure
+	 */
+	function isValid() {
+		return( !empty( $this->mCascaderId ) );
+	}
+
+	// ============== Calendar related stuff
+	/**
+	 * Provide our own day link
+	 * 
+	 * @param array $day 
+	 * @param array $month 
+	 * @param array $year 
+	 * @access public
+	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 */
+	function getDateLink( $day, $month, $year ) {
+		return CASCADER_PKG_URL."index.php?scheme=$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT )."#picker";
+	}
+
+	/**
+	 * Allow for monthly navigation
+	 * 
+	 * @param array $month 
+	 * @param array $year 
+	 * @access public
+	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
+	 */
+	function getCalendarLink( $month, $year ) {
+		return CASCADER_PKG_URL."index.php?month=$month&year=$year";
 	}
 }
 ?>

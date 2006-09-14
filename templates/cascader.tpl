@@ -55,6 +55,10 @@
 
 		{jstabs}
 			{jstab title="Color Selector"}
+				<h2>{tr}Scheme Picker{/tr}</h2>
+				<p>Currently only 10 - 13th of september are working in the calendar</p>
+				{$calendar}
+
 				<h2>{tr}Generic Page Layout{/tr}</h2>
 				<div id="preview_container" class="layout">
 					#container
@@ -77,14 +81,55 @@
 					<div id="preview_footer"> #footer </div>
 				</div>
 
-				<p>Currently only 10 - 13th of september are working in the calendar</p>
-				{$calendar}
+				{if $gCascader->mInfo.scheme}
+					{form legend="Pick your site colors" id=picker}
+						<input type="hidden" name="scheme" value="{$smarty.request.scheme}" />
+
+						<h2>Color Scheme name</h2>
+						<p> Please select a CSS property and then apply a color to it </p>
+
+						<table class="layout">
+							<caption>{tr}Color Picker{/tr}</caption>
+							<tr>
+								<th style="width:50%">{tr}CSS Selector{/tr}</th>
+								<th style="width:50%">{tr}Color{/tr}</th>
+							</tr>
+							<tr>
+								<td>
+									<ul class="idpicker">
+										{foreach key=id from=$gCascader->mInfo.properties item=property}
+											<li>
+												<label>
+													{$property.title} <input type="radio" id="_{$id}" value="{$id}" name="rad"/>
+													<input type="text" size="10" id="text_{$id}" name="cascader[{$id}]" value="{$smarty.request.cascader.$id}" />
+													<a onclick="$('text_{$id}').value=''">{biticon ipackage=icons iname="edit-delete" iexplain="Clear"}</a>
+												</label>
+											</li>
+										{/foreach}
+									</ul>
+								</td>
+								<td>
+									<ul class="colorpicker">
+										{foreach from=$gCascader->mInfo.scheme item=c}
+											<li onclick="insertText('{$c}')" style="background:{$c};">{$c} <span>{$c}</span></li>
+										{/foreach}
+									</ul>
+								</td>
+							</tr>
+						</table>
+
+						<div class="row submit">
+							<input type="submit" name="clear_style" value="{tr}Clear Style{/tr}" />
+							<input type="submit" name="create_style" value="{tr}Create / Update Style{/tr}" />
+						</div>
+					{/form}
+				{/if}
 
 				{if $cssList}
 					{form legend="List of already stored Schemes"}
 						<ul class="data">
 							{foreach key=name item=file from=$cssList}
-								<li calss="{cycle values="odd,even"}">
+								<li calss="item {cycle values="odd,even"}">
 									{if $file.url == $gBitSystem->getConfig('cascader_style')}
 										{biticon ipackage="icons" iname="dialog-ok" iexplain="Active Scheme"}
 									{else}
@@ -103,48 +148,6 @@
 					{/form}
 				{/if}
 
-				{if $colorScheme}
-					{form legend="Pick your site colors" id=picker}
-						<input type="hidden" name="color_scheme" value="{$smarty.request.color_scheme}" />
-
-						<h2>Color Scheme name</h2>
-						<p> Please select a CSS property and then apply a color to it </p>
-
-						<table class="layout">
-							<caption>{tr}Color Picker{/tr}</caption>
-							<tr>
-								<th style="width:50%">{tr}CSS Selector{/tr}</th>
-								<th style="width:50%">{tr}Color{/tr}</th>
-							</tr>
-							<tr>
-								<td>
-									<ul class="idpicker">
-										{foreach key=id from=$properties item=property}
-											<li>
-												<label>
-													{$property.title} <input type="radio" id="_{$id}" value="{$id}" name="rad"/>
-													<input type="text" size="10" id="text_{$id}" name="cascader[{$id}]" value="{$smarty.request.cascader.$id}" />
-												</label>
-											</li>
-										{/foreach}
-									</ul>
-								</td>
-								<td>
-									<ul class="colorpicker">
-										{foreach from=$colorScheme item=c}
-											<li onclick="insertText('{$c}')" style="background:{$c};">{$c} <span>{$c}</span></li>
-										{/foreach}
-									</ul>
-								</td>
-							</tr>
-						</table>
-
-						<div class="row submit">
-							<input type="submit" name="clear_style" value="{tr}Clear Style{/tr}" />
-							<input type="submit" name="create_style" value="{tr}Create Style{/tr}" />
-						</div>
-					{/form}
-				{/if}
 			{/jstab}
 
 			{jstab title="Style Layout"}
