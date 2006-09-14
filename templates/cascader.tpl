@@ -46,6 +46,10 @@
 
 		{if $style != 'cascader'}
 			{form}
+				<input type="hidden" name="scheme" value="{$smarty.request.scheme}" />
+				<input type="hidden" name="day" value="{$smarty.request.day}" />
+				<input type="hidden" name="month" value="{$smarty.request.month}" />
+				<input type="hidden" name="year" value="{$smarty.request.year}" />
 				<p>You are currently not using the cascader style. If you don't get the desired effects when applying a new color style, please switch to the cascader site style.</p>
 				<div class="row submit">
 					<input type="submit" name="cascader_style" value="Apply Cascader Style" />
@@ -84,6 +88,9 @@
 				{if $gCascader->mInfo.scheme}
 					{form legend="Pick your site colors" id=picker}
 						<input type="hidden" name="scheme" value="{$smarty.request.scheme}" />
+						<input type="hidden" name="day" value="{$smarty.request.day}" />
+						<input type="hidden" name="month" value="{$smarty.request.month}" />
+						<input type="hidden" name="year" value="{$smarty.request.year}" />
 
 						<h2>Color Scheme name</h2>
 						<p> Please select a CSS property and then apply a color to it </p>
@@ -127,9 +134,15 @@
 
 				{if $cssList}
 					{form legend="List of already stored Schemes"}
+						<input type="hidden" name="scheme" value="{$smarty.request.scheme}" />
+						<input type="hidden" name="day" value="{$smarty.request.day}" />
+						<input type="hidden" name="month" value="{$smarty.request.month}" />
+						<input type="hidden" name="year" value="{$smarty.request.year}" />
+						<p>{tr}To download a custom scheme, right click the view source icon and select: <strong>Save As</strong>{/tr}</p>
+
 						<ul class="data">
 							{foreach key=name item=file from=$cssList}
-								<li calss="item {cycle values="odd,even"}">
+								<li class="item {cycle values="odd,even"}">
 									{if $file.url == $gBitSystem->getConfig('cascader_style')}
 										{biticon ipackage="icons" iname="dialog-ok" iexplain="Active Scheme"}
 									{else}

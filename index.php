@@ -89,7 +89,8 @@ if( !empty( $_REQUEST['remove_style'] ) ) {
 
 // create the calendar
 $date = getdate( time() );
-$gBitSmarty->assign( 'calendar', $gCascader->getMonthView( ( !empty( $_REQUEST['month'] ) ? $_REQUEST['month'] : $date['mon'] ), ( !empty( $_REQUEST['year'] ) ? $_REQUEST['year'] : $date['year'] ) ) );
+$calendar = new CascaderCalendar();
+$gBitSmarty->assign( 'calendar', $calendar->getMonthView( ( !empty( $_REQUEST['month'] ) ? $_REQUEST['month'] : $date['mon'] ), ( !empty( $_REQUEST['year'] ) ? $_REQUEST['year'] : $date['year'] ) ) );
 
 // get a list of stored css files
 $cssList = $gCascader->getList();

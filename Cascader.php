@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.3 2006/09/14 18:06:12 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.4 2006/09/14 18:48:44 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.3 $
+ * @version:      $Revision: 1.4 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -14,9 +14,8 @@ require_once( CASCADER_PKG_PATH.'Calendar.php' );
 /**
  * Cascader 
  * 
- * @uses Calendar
  */
-class Cascader extends Calendar {
+class Cascader {
 	/**
 	 * Scheme Title
 	 */
@@ -67,7 +66,9 @@ class Cascader extends Calendar {
 	function load() {
 		$scheme = array();
 		if( $this->isValid() && $scheme = BitSystem::fetchRemoteFile( 'xing.hopto.org', $this->mRemotePath ) ) {
-			if( !preg_match( "/not found/i", $scheme ) ) {
+			if( preg_match( "/not found/i", $scheme ) ) {
+				$scheme = tra( 'There is no scheme for this day.' );
+			} else {
 				$scheme = explode( ' ', trim( $scheme ) );
 				$scheme[] = "#000000";
 				$scheme[] = "#FFFFFF";
@@ -131,7 +132,7 @@ class Cascader extends Calendar {
 		if( is_array( $pColorSettings ) ) {
 			foreach( $pColorSettings as $id => $value ) {
 				if( !empty( $value ) ) {
-					$ret .= $props[$id]['selector']." {\n\t".$props[$id]['property'].": $value !important;\n}\n";
+					$ret .= $props[$id]['selector']." {\n\t".$props[$id]['property'].": $value !important;\n}\n\n";
 				}
 			}
 		}
@@ -147,9 +148,7 @@ class Cascader extends Calendar {
 	 */
 	function createHeader( $pColorHash = NULL ) {
 		global $gBitSmarty;
-		$scheme['title'] = $this->mTitle;
-		$scheme['colors'] = $pColorHash;
-		$gBitSmarty->assign( 'scheme', $scheme );
+		$gBitSmarty->assign( 'gCascader', $this );
 		return $gBitSmarty->fetch( 'bitpackage:cascader/css_header.tpl' );
 	}
 
@@ -197,8 +196,9 @@ class Cascader extends Calendar {
 	function isValid() {
 		return( !empty( $this->mCascaderId ) );
 	}
+}
 
-	// ============== Calendar related stuff
+class CascaderCalendar extends Calendar {
 	/**
 	 * Provide our own day link
 	 * 
@@ -209,7 +209,7 @@ class Cascader extends Calendar {
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
 	function getDateLink( $day, $month, $year ) {
-		return CASCADER_PKG_URL."index.php?scheme=$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT )."#picker";
+		return CASCADER_PKG_URL."index.php?day=$day&amp;month=$month&amp;year=$year&amp;scheme=$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT )."#picker";
 	}
 
 	/**
@@ -221,7 +221,7 @@ class Cascader extends Calendar {
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
 	function getCalendarLink( $month, $year ) {
-		return CASCADER_PKG_URL."index.php?month=$month&year=$year";
+		return CASCADER_PKG_URL."index.php?month=$month&amp;year=$year";
 	}
 }
 ?>
