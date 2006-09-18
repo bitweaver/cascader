@@ -24,6 +24,7 @@
 	/* ]]> */
 </script>
 
+{strip}
 <div class="admin cascader">
 	<div class="header">
 		<h1>{tr}Color Scheme Picker{/tr}</h1>
@@ -31,9 +32,7 @@
 
 	<div class="body">
 		<p class="help">
-			{tr}This page allows you to apply various color schemes from the <a href="http://dailycolorscheme.com/">Daily Color Scheme</a> site and view your site using those color schemes.
-			This is <strong>not</strong> meant to create a finished theme for you, but to help you design your site.
-			It allows you to view bitweaver with a number of different color schemes and once you have found one you like, you can design your own theme based on this scheme.{/tr}
+			{tr}This page allows you to apply various color schemes from the <a href="http://dailycolorscheme.com/">Daily Color Scheme</a> site and view your site using those color schemes. This is <strong>not</strong> meant to create a finished theme for you, but to help you design your site. It allows you to view bitweaver with a number of different color schemes and once you have found one you like, you can design your own theme based on this scheme.{/tr}
 		</p>
 
 		{if $smarty.request.site_style_layout}
@@ -182,3 +181,4 @@
 		{/jstabs}
 	</div> <!-- end .body -->
 </div>  <!-- end .themes -->
+{/strip}
