@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.4 2006/09/14 18:48:44 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.5 2006/09/18 15:23:56 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.4 $
+ * @version:      $Revision: 1.5 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -37,6 +37,11 @@ class Cascader {
 	var $mInfo = array();
 
 	/**
+	 * Errors
+	 */
+	var $mErrors = array();
+
+	/**
 	 * Initiate class
 	 *
 	 * @param $pContentId content id of the treasury - use either one of the ids.
@@ -67,18 +72,20 @@ class Cascader {
 		$scheme = array();
 		if( $this->isValid() && $scheme = BitSystem::fetchRemoteFile( 'xing.hopto.org', $this->mRemotePath ) ) {
 			if( preg_match( "/not found/i", $scheme ) ) {
-				$scheme = tra( 'There is no scheme for this day.' );
+				$this->mErrors['load'] = tra( 'There is no scheme for this day.' );
 			} else {
 				$scheme = explode( ' ', trim( $scheme ) );
 				$scheme[] = "#000000";
 				$scheme[] = "#FFFFFF";
 			}
+		} elseif( $this->isValid() ) {
+			$this->mErrors['load'] = tra( 'There is no scheme for this day.' );
 		}
 		$this->mTitle = "Scheme Name";
 		$this->mInfo['scheme'] = $scheme;
 		$this->mInfo['title'] = $this->mTitle;
 		$this->loadProperties();
-		return( count( $scheme ) );
+		return( !empty( $scheme ) );
 	}
 
 	/**
@@ -209,7 +216,11 @@ class CascaderCalendar extends Calendar {
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
 	function getDateLink( $day, $month, $year ) {
-		return CASCADER_PKG_URL."index.php?day=$day&amp;month=$month&amp;year=$year&amp;scheme=$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT )."#picker";
+		global $gBitSystem;
+		if( $gBitSystem->mServerTimestamp->mktime( 0, 0, 0, $month, $day, $year ) < $gBitSystem->mServerTimestamp->getUTCTime() ) {
+			$scheme = "$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT );
+			return CASCADER_PKG_URL."index.php?day=$day&amp;month=$month&amp;year=$year&amp;scheme=$scheme#picker";
+		}
 	}
 
 	/**

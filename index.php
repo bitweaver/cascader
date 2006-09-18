@@ -38,11 +38,12 @@ if( !empty( $_REQUEST['scheme'] ) ) {
 	$remoteId = NULL;
 }
 $gCascader = new Cascader( $remoteId );
-$gCascader->load();
+if( !$gCascader->load() ) {
+	$feedback['error'] = $gCascader->mErrors;
+}
 
-// Make sure gCascader is avalable in the templates as well
+// Make sure gCascader is avalable in the templates
 $gBitSmarty->assign_by_ref( 'gCascader', $gCascader );
-
 
 // Process form requests
 
