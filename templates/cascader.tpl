@@ -59,7 +59,6 @@
 		{jstabs}
 			{jstab title="Color Selector"}
 				<h2>{tr}Scheme Picker{/tr}</h2>
-				<p>Currently only 10 - 13th of september are working in the calendar</p>
 				{$calendar}
 
 				<h2>{tr}Generic Page Layout{/tr}</h2>

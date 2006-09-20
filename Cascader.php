@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.5 2006/09/18 15:23:56 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.6 2006/09/20 06:50:52 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.5 $
+ * @version:      $Revision: 1.6 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -217,7 +217,7 @@ class CascaderCalendar extends Calendar {
 	 */
 	function getDateLink( $day, $month, $year ) {
 		global $gBitSystem;
-		if( $gBitSystem->mServerTimestamp->mktime( 0, 0, 0, $month, $day, $year ) < $gBitSystem->mServerTimestamp->getUTCTime() ) {
+		if( $month >= 9 && $year >= 2006 && $gBitSystem->mServerTimestamp->mktime( 0, 0, 0, $month, $day, $year ) < $gBitSystem->mServerTimestamp->getUTCTime() ) {
 			$scheme = "$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT );
 			return CASCADER_PKG_URL."index.php?day=$day&amp;month=$month&amp;year=$year&amp;scheme=$scheme#picker";
 		}

@@ -3,9 +3,8 @@
 	<style type="text/css">
 		table.calendar				{margin:1em auto; text-align:center; width:250px;}
 		table.calendar a			{display:block;}
-		table.calendar td.day		{text-align:right;}
-		table.calendar td.day a		{line-height:2em; padding:0 1.5em;}
-		table.calendar td.today a	{font-weight:bold; border:1px solid #ccc;}
+		table.calendar td.day		{line-height:2.5em;}
+		table.calendar td.today		{font-weight:bold; border:1px solid #ccc;}
 		ul.colorpicker				{background:#eee;}
 		ul.colorpicker,
 		ul.colorpicker li			{border:1px solid #999;}
