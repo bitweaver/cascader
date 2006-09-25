@@ -45,7 +45,6 @@
 
 		{if $style != 'cascader'}
 			{form}
-				<input type="hidden" name="scheme" value="{$smarty.request.scheme}" />
 				<input type="hidden" name="day" value="{$smarty.request.day}" />
 				<input type="hidden" name="month" value="{$smarty.request.month}" />
 				<input type="hidden" name="year" value="{$smarty.request.year}" />
@@ -83,14 +82,13 @@
 					<div id="preview_footer"> #footer </div>
 				</div>
 
-				{if $gCascader->mInfo.scheme}
+				{if $gCascader->mInfo.colors}
 					{form legend="Pick your site colors" id=picker}
-						<input type="hidden" name="scheme" value="{$smarty.request.scheme}" />
 						<input type="hidden" name="day" value="{$smarty.request.day}" />
 						<input type="hidden" name="month" value="{$smarty.request.month}" />
 						<input type="hidden" name="year" value="{$smarty.request.year}" />
 
-						<h2>Color Scheme name</h2>
+						<h2>{$gCascader->mTitle}</h2>
 						<p> Please select a CSS property and then apply a color to it </p>
 
 						<table class="layout">
@@ -115,7 +113,7 @@
 								</td>
 								<td>
 									<ul class="colorpicker">
-										{foreach from=$gCascader->mInfo.scheme item=c}
+										{foreach from=$gCascader->mInfo.colors item=c}
 											<li onclick="insertText('{$c}')" style="background:{$c};">{$c} <span>{$c}</span></li>
 										{/foreach}
 									</ul>
@@ -132,7 +130,6 @@
 
 				{if $cssList}
 					{form legend="List of already stored Schemes"}
-						<input type="hidden" name="scheme" value="{$smarty.request.scheme}" />
 						<input type="hidden" name="day" value="{$smarty.request.day}" />
 						<input type="hidden" name="month" value="{$smarty.request.month}" />
 						<input type="hidden" name="year" value="{$smarty.request.year}" />
@@ -146,9 +143,9 @@
 									{else}
 										{biticon ipackage="liberty" iname="spacer" iexplain="Active Scheme"}
 									{/if}
-									<a href="{$smarty.const.CASCADER_PKG_URL}index.php?apply_style={$name}">{$name}</a>
-									<a href="{$file.url}">{biticon ipackage=icons iname="edit-find" iexplain="View Source"}</a>
-									<a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{biticon ipackage=icons iname="edit-delete" iexplain="Remove File"}</a>
+									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?apply_style={$name}">{$name}</a>
+									&nbsp; <a href="{$file.url}">{biticon ipackage=icons iname="edit-find" iexplain="View Source"}</a>
+									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{biticon ipackage=icons iname="edit-delete" iexplain="Remove File"}</a>
 								</li>
 							{/foreach}
 						</ul>
@@ -158,7 +155,6 @@
 						</div>
 					{/form}
 				{/if}
-
 			{/jstab}
 
 			{jstab title="Style Layout"}

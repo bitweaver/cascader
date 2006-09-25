@@ -30,14 +30,8 @@ if( !empty( $_REQUEST["site_style_layout"] ) ) {
 	$gBitSystem->storeConfig( 'site_style_layout', ( ( $_REQUEST["site_style_layout"] != 'remove' ) ? $_REQUEST["site_style_layout"] : NULL ), THEMES_PKG_NAME );
 }
 
-
-// set the remoteId
-if( !empty( $_REQUEST['scheme'] ) ) {
-	$remoteId = '/dcs/'.$_REQUEST['scheme'];
-} else {
-	$remoteId = NULL;
-}
-$gCascader = new Cascader( $remoteId );
+// load cascader
+$gCascader = new Cascader( $_REQUEST );
 if( !$gCascader->load() ) {
 	$feedback['error'] = $gCascader->mErrors;
 }

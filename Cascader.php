@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.6 2006/09/20 06:50:52 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.7 2006/09/25 15:54:36 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.6 $
+ * @version:      $Revision: 1.7 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -12,8 +12,8 @@
 require_once( CASCADER_PKG_PATH.'Calendar.php' );
 
 /**
- * Cascader 
- * 
+ * Cascader
+ *
  */
 class Cascader {
 	/**
@@ -49,48 +49,205 @@ class Cascader {
 	 * @return none
 	 * @access public
 	 **/
-	function Cascader( $pRemotePath = NULL ) {
-		// this string is likely to be messed up. lets turn it into something nice
-		if( !empty( $pRemotePath ) ) {
-			preg_match( "#(/[\d]+)*$#", $pRemotePath, $match );
-			$id = str_replace( "/", "", $match[0] );
+	function Cascader( $pDate ) {
+		// turn the date into a valid path
+		if( !empty( $pDate['year'] ) && !empty( $pDate['month'] ) && !empty( $pDate['day'] ) ) {
+			$remotePath =
+				"/archive/".
+				$pDate['year']."/".
+				str_pad( $pDate['month'], 2, 0, STR_PAD_LEFT )."/".
+				str_pad( $pDate['day'], 2, 0, STR_PAD_LEFT ).
+				"/scheme.xml";
 		} else {
-			$id = 0;
+			$remotePath = FALSE;
 		}
-		$this->mCascaderId = $id;
-		$this->mRemotePath = $pRemotePath;
+
+		$this->mRemotePath = $remotePath;
+	}
+
+	function parseXml( $pXmlString ) {
+		// create xml parser object
+		$parser = xml_parser_create();
+
+		xml_parser_set_option( $parser, XML_OPTION_SKIP_WHITE, 1 );
+		xml_parser_set_option( $parser, XML_OPTION_CASE_FOLDING, 0);
+		if( !xml_parse_into_struct( $parser, $pXmlString, $values, $index ) ) {
+			$this->mErrors['xml_parsing'] = sprintf(
+				"XML Error: %s at line %d",
+				xml_error_string( $xml_get_error_code( $parser ) ),
+				xml_get_current_line_number( $parser )
+			);
+		}
+		xml_parser_free($parser);
+
+		//vd($values);
+		//vd($index);
+
+		$ret = FALSE;
+		foreach( $values as $element ) {
+			if( $element['type'] == 'open' ) {
+				if( array_key_exists( 'attributes', $element ) ) {
+					list( $level[$element['level']], $extra ) = array_values( $element['attributes'] );
+				} else {
+					$level[$element['level']] = $element['tag'];
+				}
+			}
+
+			if( $element['type'] == 'complete' ) {
+				$start_level = 1;
+				$evaluate = '$ret';
+				while( $start_level < $element['level'] ) {
+					$evaluate .= '[$level['.$start_level.']]';
+					$start_level++;
+				}
+				$evaluate .= '[$element[\'tag\']] = $element[\'value\'];';
+				eval( $evaluate );
+			}
+		}
+
+		return $ret;
+	}
+
+	// Convert XML string to usable nested php array
+	// nabbed from http://www.php.net/manual/nl/function.xml-parse-into-struct.php
+	// peter at elemental dot org
+	// 14-Jun-2005 04:09
+	function xmlToArray( $xml_data ) {
+		// parse the XML datastring
+		$xml_parser = xml_parser_create ();
+		xml_parser_set_option( $xml_parser, XML_OPTION_SKIP_WHITE, 1 );
+		xml_parser_set_option( $xml_parser, XML_OPTION_CASE_FOLDING, 0);
+		if( !xml_parse_into_struct( $xml_parser, $xml_data, $values, $index ) ) {
+			$this->mErrors['xml_parsing'] = sprintf(
+				"XML Error: %s at line %d",
+				xml_error_string( $xml_get_error_code( $parser ) ),
+				xml_get_current_line_number( $parser )
+			);
+		}
+		xml_parser_free ($xml_parser);
+
+		// convert the parsed data into a PHP datatype
+		$ret = array();
+		$ptrs[0] = &$ret;
+		foreach( $values as $element ) {
+			$level = $element['level'] - 1;
+			switch( $element['type'] ) {
+				case 'open':
+					$tag_or_id = ( array_key_exists( 'attributes', $element ) ) ? $element['attributes']['id'] : $element['tag'];
+					$ptrs[$level][$tag_or_id] = array();
+					$ptrs[$level+1] = &$ptrs[$level][$tag_or_id];
+					break;
+				case 'complete':
+					$ptrs[$level][$element['tag']] = ( isset( $element['value'] ) ) ? $element['value'] : '';
+					break;
+			}
+		}
+
+		// we set the mCascaderId here
+		foreach( $index['scheme'] as $idx ) {
+			if( $values[$idx]['type'] == 'open' ) {
+				$ret['cascader_id'] = $values[$idx]['attributes']['id'];
+			}
+		}
+
+		return $ret;
 	}
 
 	/**
 	 * Load the color scheme
-	 * 
+	 *
 	 * @param array $pRemotePath Remote path to daily color scheme e.g.: 2006/04/28
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
 	function load() {
 		$scheme = array();
-		if( $this->isValid() && $scheme = BitSystem::fetchRemoteFile( 'xing.hopto.org', $this->mRemotePath ) ) {
-			if( preg_match( "/not found/i", $scheme ) ) {
+		if( $this->isValid() && $xml = BitSystem::fetchRemoteFile( 'xing.hopto.org', $this->mRemotePath ) ) {
+			if( preg_match( "/not found/i", $xml ) ) {
 				$this->mErrors['load'] = tra( 'There is no scheme for this day.' );
 			} else {
-				$scheme = explode( ' ', trim( $scheme ) );
-				$scheme[] = "#000000";
-				$scheme[] = "#FFFFFF";
+
+				$schemeInfo = $this->xmlToArray( $xml );
+
+				foreach( $schemeInfo['service'] as $key => $info ) {
+					$this->mInfo = array_merge( $this->mInfo, $info );
+					// this is very dodgy...
+					if( is_numeric( $key ) ) {
+						$this->mCascaderId = $key;
+					}
+
+					if( !empty( $info['colors'] ) ) {
+						foreach( $info['colors'] as $id => $color ) {
+							$this->mInfo['colors'][$id] = '#'.$color['hex'];
+						}
+					}
+				}
+
+				$this->mTitle = $this->mInfo['title'];
+				$this->mCascaderId = $schemeInfo['cascader_id'];
+
+//				$this->mTitle = $this->mInfo['title'];
+//				vd($this->mCascaderId);
+//				vd($this->mInfo);
+
+/*
+				$parser = xml_parser_create();
+				xml_parser_set_option( $parser, XML_OPTION_SKIP_WHITE, 1 );
+				xml_parser_set_option( $parser, XML_OPTION_CASE_FOLDING, 0);
+				if( !xml_parse_into_struct( $parser, $xml, $data, $index ) ) {
+					$this->mErrors['xml_parsing'] = print_error();
+				}
+				xml_parser_free($parser);
+
+				//vd($data);
+				//vd($index);
+
+				// parse the data we extracted
+
+				// cycle all <color> tags.
+				// $index['color'] contains all pointers to <color> tags
+				for( $i = 0; $i < count( $index['color'] ); $i++ ) {
+					// extract needed information
+					if( $data[$i]['type'] == 'complete' && $data[$i]['tag'] != 'hex' ) {
+						$this->mInfo[$data[$i]['tag']] = $data[$i]['value'];
+					}
+
+					// since we have <color> nested inside the <colors> tag,
+					// we have to check if pointer is to open type tag.
+					if( $data[$index['color'][$i]]['type'] == 'open' ) {
+
+						// extract needed information
+						for( $j = $index['color'][$i]; $j < $index['color'][$i+1]; $j++ ) {
+							if( $data[$j]['tag'] == 'hex' ) {
+								$this->mInfo['colors'][] = '#'.$data[$j]['value'];
+							}
+						}
+					}
+				}
+
+				foreach( $index['scheme'] as $idx ) {
+					if( $data[$idx]['type'] == 'open' ) {
+						$this->mCascaderId = $data[$idx]['attributes']['id'];
+					}
+				}
+
+				$this->mTitle = $this->mInfo['title'];
+				vd($this->mCascaderId);
+				vd($this->mInfo);
+*/
+
 			}
 		} elseif( $this->isValid() ) {
 			$this->mErrors['load'] = tra( 'There is no scheme for this day.' );
 		}
-		$this->mTitle = "Scheme Name";
-		$this->mInfo['scheme'] = $scheme;
-		$this->mInfo['title'] = $this->mTitle;
+
 		$this->loadProperties();
 		return( !empty( $scheme ) );
 	}
 
 	/**
-	 * Load Properties 
-	 * 
+	 * Load Properties
+	 *
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
@@ -102,7 +259,7 @@ class Cascader {
 
 	/**
 	 * Get a list of stored styles
-	 * 
+	 *
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
@@ -124,7 +281,7 @@ class Cascader {
 
 	/**
 	 * Create a valid css file based on a set of colors and the appropriate ids
-	 * 
+	 *
 	 * @param array $pColorHash Set of colors
 	 * @access public
 	 * @return CSS as a string
@@ -148,7 +305,7 @@ class Cascader {
 
 	/**
 	 * Create a header for the css file
-	 * 
+	 *
 	 * @param array $pSchemeHash Scheme information including color set and title
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
@@ -161,26 +318,26 @@ class Cascader {
 
 	/**
 	 * Write CSS to file
-	 * 
+	 *
 	 * @param array $pStyleName Name of the file to store it to
-	 * @param array $pString 
+	 * @param array $pString
 	 * @access public
 	 * @return the URL to the file just stored - ready for linking
 	 */
 	function writeCss( $pString = NULL ) {
-		if( $this->isValid() && !empty( $pString ) && $branch = LibertyAttachable::getStorageBranch() ) {
+		if( $this->isValid() && !empty( $pString ) && $path = LibertyAttachable::getStoragePath() ) {
 			// We need to work out what name to use
-			$storefile = $this->mCascaderId.'-'.str_replace( " ", "_", $this->mTitle ).'.css';
-			$fh = fopen( BIT_ROOT_PATH.$branch.$storefile, 'w' );
+			$storefile = $this->mInfo['date'].'-'.str_replace( " ", "_", $this->mTitle ).'.css';
+			$fh = fopen( $path.$storefile, 'w' );
 			fwrite( $fh, $pString );
 			fclose( $fh );
-			return BIT_ROOT_URL.$branch.$storefile;
+			return LibertyAttachable::getStorageUrl().$storefile;
 		}
 	}
 
 	/**
 	 * remove a specific css file
-	 * 
+	 *
 	 * @param array $pStyleName Name of the file
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
@@ -196,22 +353,22 @@ class Cascader {
 
 	/**
 	 * Check if class is valid
-	 * 
+	 *
 	 * @access public
 	 * @return TRUE on success, FALSE on failure
 	 */
 	function isValid() {
-		return( !empty( $this->mCascaderId ) );
+		return( !empty( $this->mRemotePath ) );
 	}
 }
 
 class CascaderCalendar extends Calendar {
 	/**
 	 * Provide our own day link
-	 * 
-	 * @param array $day 
-	 * @param array $month 
-	 * @param array $year 
+	 *
+	 * @param array $day
+	 * @param array $month
+	 * @param array $year
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
@@ -219,20 +376,28 @@ class CascaderCalendar extends Calendar {
 		global $gBitSystem;
 		if( $month >= 9 && $year >= 2006 && $gBitSystem->mServerTimestamp->mktime( 0, 0, 0, $month, $day, $year ) < $gBitSystem->mServerTimestamp->getUTCTime() ) {
 			$scheme = "$year/".str_pad( $month, 2, 0, STR_PAD_LEFT )."/".str_pad( $day, 2, 0, STR_PAD_LEFT );
-			return CASCADER_PKG_URL."index.php?day=$day&amp;month=$month&amp;year=$year&amp;scheme=$scheme#picker";
+			return CASCADER_PKG_URL."index.php?day=$day&amp;month=$month&amp;year=$year#picker";
 		}
 	}
 
 	/**
 	 * Allow for monthly navigation
-	 * 
-	 * @param array $month 
-	 * @param array $year 
+	 *
+	 * @param array $month
+	 * @param array $year
 	 * @access public
 	 * @return TRUE on success, FALSE on failure - mErrors will contain reason for failure
 	 */
 	function getCalendarLink( $month, $year ) {
 		return CASCADER_PKG_URL."index.php?month=$month&amp;year=$year";
 	}
+}
+
+function xml_print_error() {
+	global $parser;
+	return( sprintf( "XML Error: %s at line %d",
+		xml_error_string( $xml_get_error_code( $parser ) ),
+		xml_get_current_line_number( $parser )
+	) );
 }
 ?>
