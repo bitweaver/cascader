@@ -103,7 +103,7 @@
 										{foreach key=id from=$gCascader->mInfo.properties item=property}
 											<li>
 												<label>
-													{$property.title} <input type="radio" id="_{$id}" value="{$id}" name="rad"/>
+													{$property.title|escape} <input type="radio" id="_{$id}" value="{$id}" name="rad"/>
 													<input type="text" size="10" id="text_{$id}" name="cascader[{$id}]" value="{$smarty.request.cascader.$id}" />
 													<a onclick="$('text_{$id}').value=''">{biticon ipackage=icons iname="edit-delete" iexplain="Clear"}</a>
 												</label>
