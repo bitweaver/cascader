@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.9 2007/04/15 09:53:49 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.10 2007/04/15 10:41:31 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.9 $
+ * @version:      $Revision: 1.10 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -162,7 +162,7 @@ class Cascader {
 	 */
 	function load() {
 		$scheme = array();
-		if( $this->isValid() && $xml = http_request( 'http://xing.hopto.org'.$this->mRemotePath ) ) {
+		if( $this->isValid() && $xml = bit_http_request( 'http://xing.hopto.org'.$this->mRemotePath ) ) {
 			if( preg_match( "/not found/i", $xml ) ) {
 				$this->mErrors['load'] = tra( 'There is no scheme for this day.' );
 			} else {
