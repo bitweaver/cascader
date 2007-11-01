@@ -1,9 +1,9 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.10 2007/04/15 10:41:31 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.11 2007/11/01 16:24:30 squareing Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.10 $
+ * @version:      $Revision: 1.11 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
  * @package:      treasury
  * @copyright:    2003-2006 bitweaver
@@ -53,7 +53,7 @@ class Cascader {
 		// turn the date into a valid path
 		if( !empty( $pDate['year'] ) && !empty( $pDate['month'] ) && !empty( $pDate['day'] ) ) {
 			$remotePath =
-				"/archive/".
+				"/storage/".
 				$pDate['year']."/".
 				str_pad( $pDate['month'], 2, 0, STR_PAD_LEFT )."/".
 				str_pad( $pDate['day'], 2, 0, STR_PAD_LEFT ).
@@ -113,25 +113,20 @@ class Cascader {
 	// peter at elemental dot org
 	// 14-Jun-2005 04:09
 	function xmlToArray( $xml_data ) {
+		$ret = array();
 		// parse the XML datastring
 		$xml_parser = xml_parser_create ();
 		xml_parser_set_option( $xml_parser, XML_OPTION_SKIP_WHITE, 1 );
 		xml_parser_set_option( $xml_parser, XML_OPTION_CASE_FOLDING, 0);
-		if( !xml_parse_into_struct( $xml_parser, $xml_data, $values, $index ) ) {
-			$this->mErrors['xml_parsing'] = sprintf(
-				"XML Error: %s at line %d",
-				xml_error_string( $xml_get_error_code( $parser ) ),
-				xml_get_current_line_number( $parser )
-			);
-		}
-		xml_parser_free ($xml_parser);
+		if( xml_parse_into_struct( $xml_parser, $xml_data, $values, $index ) ) {
+			xml_parser_free( $xml_parser );
 
-		// convert the parsed data into a PHP datatype
-		$ret = array();
-		$ptrs[0] = &$ret;
-		foreach( $values as $element ) {
-			$level = $element['level'] - 1;
-			switch( $element['type'] ) {
+			// convert the parsed data into a PHP datatype
+			$ret = array();
+			$ptrs[0] = &$ret;
+			foreach( $values as $element ) {
+				$level = $element['level'] - 1;
+				switch( $element['type'] ) {
 				case 'open':
 					$tag_or_id = ( array_key_exists( 'attributes', $element ) ) ? $element['attributes']['id'] : $element['tag'];
 					$ptrs[$level][$tag_or_id] = array();
@@ -140,14 +135,21 @@ class Cascader {
 				case 'complete':
 					$ptrs[$level][$element['tag']] = ( isset( $element['value'] ) ) ? $element['value'] : '';
 					break;
+				}
 			}
-		}
 
-		// we set the mCascaderId here
-		foreach( $index['scheme'] as $idx ) {
-			if( $values[$idx]['type'] == 'open' ) {
-				$ret['cascader_id'] = $values[$idx]['attributes']['id'];
+			// we set the mCascaderId here
+			foreach( $index['scheme'] as $idx ) {
+				if( $values[$idx]['type'] == 'open' ) {
+					$ret['cascader_id'] = $values[$idx]['attributes']['id'];
+				}
 			}
+		} else {
+			$this->mErrors['xml_parsing'] = sprintf(
+				"XML Error: %s at line %d",
+				xml_error_string( xml_get_error_code( $xml_parser ) ),
+				xml_get_current_line_number( $xml_parser )
+			);
 		}
 
 		return $ret;
@@ -162,11 +164,10 @@ class Cascader {
 	 */
 	function load() {
 		$scheme = array();
-		if( $this->isValid() && $xml = bit_http_request( 'http://xing.hopto.org'.$this->mRemotePath ) ) {
+		if( $this->isValid() && $xml = bit_http_request( 'http://www.bitweaver.org'.$this->mRemotePath ) ) {
 			if( preg_match( "/not found/i", $xml ) ) {
 				$this->mErrors['load'] = tra( 'There is no scheme for this day.' );
 			} else {
-
 				$schemeInfo = $this->xmlToArray( $xml );
 
 				foreach( $schemeInfo['service'] as $key => $info ) {
