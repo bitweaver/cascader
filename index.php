@@ -91,8 +91,8 @@ $gBitSmarty->assign( 'calendar', $calendar->getMonthView( ( !empty( $_REQUEST['m
 $cssList = $gCascader->getList();
 $gBitSmarty->assign( 'cssList', $cssList );
 
-// crude method of loading css styling but we can fix this later
-$gBitSmarty->assign( "loadThemesCss", TRUE );
+// load css file
+$gBitThemes->loadCss( THEMES_PKG_PATH.'themes.css' );
 $gBitSmarty->assign( "feedback", $feedback );
 
 $gBitSystem->display( 'bitpackage:cascader/cascader.tpl', 'Cascader' );
