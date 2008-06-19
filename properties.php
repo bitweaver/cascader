@@ -1,4 +1,16 @@
 <?php
+/**
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/properties.php,v 1.3 2008/06/19 05:59:38 lsces Exp $
+ *
+ * @author:       xing  <xing@synapse.plus.com>
+ * @copyright:    2003-2006 bitweaver
+ * @package:      cascader
+ * @subpackage functions
+ */
+
+/**
+ * Initialize
+ */
 // list of availabe properties that can be set
 // array key needs to be unique using only [A-Za-z_]
 $properties = array(

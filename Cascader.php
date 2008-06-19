@@ -1,19 +1,24 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.11 2007/11/01 16:24:30 squareing Exp $
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.12 2008/06/19 05:59:38 lsces Exp $
  *
  * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.11 $
+ * @version:      $Revision: 1.12 $
  * @created:      Monday Jul 03, 2006   11:53:42 CEST
- * @package:      treasury
+ * @package:      cascader
  * @copyright:    2003-2006 bitweaver
  * @license:      LGPL {@link http://www.gnu.org/licenses/lgpl.html}
- **/
+ */
+
+/**
+ * Initialize
+ */
 require_once( CASCADER_PKG_PATH.'Calendar.php' );
 
 /**
  * Cascader
  *
+ * @package:      cascader
  */
 class Cascader {
 	/**
@@ -363,6 +368,11 @@ class Cascader {
 	}
 }
 
+/**
+ * CascaderCalendar
+ *
+ * @package:      cascader
+ */
 class CascaderCalendar extends Calendar {
 	/**
 	 * Provide our own day link

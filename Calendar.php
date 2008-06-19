@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Calendar.php,v 1.2 2008/06/19 05:59:38 lsces Exp $
+ *
 // PHP Calendar Class Version 1.4 (5th March 2001)
 //  
 // Copyright David Wilkinson 2000 - 2001. All Rights reserved.
@@ -17,8 +19,14 @@
 //
 // URL:   http://www.cascade.org.uk/software/php/calendar/
 // Email: davidw@cascade.org.uk
+ * @package:      cascader
+ */
 
-
+/**
+ * Calendar
+ *
+ * @package:      cascader
+ */
 class Calendar {
 	/*
 		Constructor for the Calendar class
