@@ -1,9 +1,9 @@
 <?php
 /**
- * @version      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.13 2008/06/19 06:44:28 lsces Exp $
+ * @version      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.14 2008/06/19 09:35:43 lsces Exp $
  *
  * @author       xing  <xing@synapse.plus.com>
- * @created      Monday Jul 03, 2006   11:53:42 CEST
+ * created      Monday Jul 03, 2006   11:53:42 CEST
  * @package      cascader
  * @copyright    2003-2006 bitweaver
  * @license      LGPL {@link http://www.gnu.org/licenses/lgpl.html}
