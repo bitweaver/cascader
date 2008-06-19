@@ -1,11 +1,11 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/properties.php,v 1.3 2008/06/19 05:59:38 lsces Exp $
+ * @version      $Header: /cvsroot/bitweaver/_bit_cascader/properties.php,v 1.4 2008/06/19 07:00:56 lsces Exp $
  *
- * @author:       xing  <xing@synapse.plus.com>
- * @copyright:    2003-2006 bitweaver
- * @package:      cascader
- * @subpackage functions
+ * @author       xing  <xing@synapse.plus.com>
+ * @copyright    2003-2006 bitweaver
+ * @package      cascader
+ * @subpackage   functions
  */
 
 /**
