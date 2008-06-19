@@ -1,6 +1,6 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Calendar.php,v 1.2 2008/06/19 05:59:38 lsces Exp $
+ * @version      $Header: /cvsroot/bitweaver/_bit_cascader/Calendar.php,v 1.3 2008/06/19 06:44:28 lsces Exp $
  *
 // PHP Calendar Class Version 1.4 (5th March 2001)
 //  
@@ -19,13 +19,13 @@
 //
 // URL:   http://www.cascade.org.uk/software/php/calendar/
 // Email: davidw@cascade.org.uk
- * @package:      cascader
+ * @package      cascader
  */
 
 /**
  * Calendar
  *
- * @package:      cascader
+ * @package      cascader
  */
 class Calendar {
 	/*

@@ -1,13 +1,12 @@
 <?php
 /**
- * @version:      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.12 2008/06/19 05:59:38 lsces Exp $
+ * @version      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.13 2008/06/19 06:44:28 lsces Exp $
  *
- * @author:       xing  <xing@synapse.plus.com>
- * @version:      $Revision: 1.12 $
- * @created:      Monday Jul 03, 2006   11:53:42 CEST
- * @package:      cascader
- * @copyright:    2003-2006 bitweaver
- * @license:      LGPL {@link http://www.gnu.org/licenses/lgpl.html}
+ * @author       xing  <xing@synapse.plus.com>
+ * @created      Monday Jul 03, 2006   11:53:42 CEST
+ * @package      cascader
+ * @copyright    2003-2006 bitweaver
+ * @license      LGPL {@link http://www.gnu.org/licenses/lgpl.html}
  */
 
 /**
@@ -18,7 +17,7 @@ require_once( CASCADER_PKG_PATH.'Calendar.php' );
 /**
  * Cascader
  *
- * @package:      cascader
+ * @package      cascader
  */
 class Cascader {
 	/**
@@ -371,7 +370,7 @@ class Cascader {
 /**
  * CascaderCalendar
  *
- * @package:      cascader
+ * @package      cascader
  */
 class CascaderCalendar extends Calendar {
 	/**
