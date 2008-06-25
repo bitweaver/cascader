@@ -95,5 +95,5 @@ $gBitSmarty->assign( 'cssList', $cssList );
 $gBitThemes->loadCss( THEMES_PKG_PATH.'themes.css' );
 $gBitSmarty->assign( "feedback", $feedback );
 
-$gBitSystem->display( 'bitpackage:cascader/cascader.tpl', 'Cascader' );
+$gBitSystem->display( 'bitpackage:cascader/cascader.tpl', 'Cascader' , array( 'display_mode' => 'display' ));
 ?>
