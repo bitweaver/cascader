@@ -1,6 +1,6 @@
 <?php
 // Initial setup
-require_once( '../bit_setup_inc.php' );
+require_once( '../kernel/setup_inc.php' );
 require_once( CASCADER_PKG_PATH.'Cascader.php' );
 
 // Only admin can use this - for now
