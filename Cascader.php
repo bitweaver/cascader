@@ -1,6 +1,6 @@
 <?php
 /**
- * @version      $Header: /cvsroot/bitweaver/_bit_cascader/Cascader.php,v 1.14 2008/06/19 09:35:43 lsces Exp $
+ * @version      $Header$
  *
  * @author       xing  <xing@synapse.plus.com>
  * created      Monday Jul 03, 2006   11:53:42 CEST

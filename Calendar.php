@@ -1,6 +1,6 @@
 <?php
 /**
- * @version      $Header: /cvsroot/bitweaver/_bit_cascader/Calendar.php,v 1.3 2008/06/19 06:44:28 lsces Exp $
+ * @version      $Header$
  *
 // PHP Calendar Class Version 1.4 (5th March 2001)
 //  
