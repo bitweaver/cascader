@@ -139,12 +139,12 @@
 							{foreach key=name item=file from=$cssList}
 								<li class="item {cycle values="odd,even"}">
 									{if $file.url == $gBitSystem->getConfig('cascader_style')}
-										{biticon ipackage="icons" iname="dialog-ok" iexplain="Active Scheme"}
+										{booticon iname="icon-ok"  ipackage="icons"  iexplain="Active Scheme"}
 									{else}
 										{biticon ipackage="liberty" iname="spacer" iexplain="Active Scheme"}
 									{/if}
 									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?apply_style={$name}">{$name}</a>
-									&nbsp; <a href="{$file.url}">{biticon ipackage=icons iname="edit-find" iexplain="View Source"}</a>
+									&nbsp; <a href="{$file.url}">{booticon iname="icon-search"  ipackage=icons  iexplain="View Source"}</a>
 									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{booticon iname="icon-trash"  ipackage=icons  iexplain="Remove File"}</a>
 								</li>
 							{/foreach}
@@ -164,7 +164,7 @@
 							<li class="{cycle values="even,odd"}">
 								<a {if $gBitSystem->getConfig('site_style_layout') == $key}class="highlight" {/if}href="{$smarty.const.CASCADER_PKG_URL}index.php?site_style_layout={$key}">
 									{if $layout.gif}<img src="{$smarty.const.THEMES_PKG_URL}layouts/{$layout.gif}" alt="{tr}Layout{/tr}: {$key}" title="{tr}Layout{/tr}: {$key}"/><br />{/if}
-									{if $gBitSystem->getConfig('site_style_layout') == $key}{biticon ipackage="icons" iname="dialog-ok" iexplain="Current Style Layout"}{/if}
+									{if $gBitSystem->getConfig('site_style_layout') == $key}{booticon iname="icon-ok"  ipackage="icons"  iexplain="Current Style Layout"}{/if}
 									{$key|replace:"_":" "}
 									{if $layout.txt}<br />{include file="`$smarty.const.THEMES_PKG_PATH`layouts/`$layout.txt`"}{/if}
 								</a>
