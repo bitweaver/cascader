@@ -105,7 +105,7 @@
 												<label>
 													{$property.title|escape} <input type="radio" id="_{$id}" value="{$id}" name="rad"/>
 													<input type="text" size="10" id="text_{$id}" name="cascader[{$id}]" value="{$smarty.request.cascader.$id}" />
-													<a onclick="$('text_{$id}').value=''">{biticon ipackage=icons iname="edit-delete" iexplain="Clear"}</a>
+													<a onclick="$('text_{$id}').value=''">{booticon iname="icon-trash"  ipackage=icons  iexplain="Clear"}</a>
 												</label>
 											</li>
 										{/foreach}
@@ -145,7 +145,7 @@
 									{/if}
 									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?apply_style={$name}">{$name}</a>
 									&nbsp; <a href="{$file.url}">{biticon ipackage=icons iname="edit-find" iexplain="View Source"}</a>
-									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{biticon ipackage=icons iname="edit-delete" iexplain="Remove File"}</a>
+									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{booticon iname="icon-trash"  ipackage=icons  iexplain="Remove File"}</a>
 								</li>
 							{/foreach}
 						</ul>
