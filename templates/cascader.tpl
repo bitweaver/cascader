@@ -138,11 +138,7 @@
 						<ul class="data">
 							{foreach key=name item=file from=$cssList}
 								<li class="item {cycle values="odd,even"}">
-									{if $file.url == $gBitSystem->getConfig('cascader_style')}
-										{booticon iname="icon-ok"  ipackage="icons"  iexplain="Active Scheme"}
-									{else}
-										{biticon ipackage="liberty" iname="spacer" iexplain="Active Scheme"}
-									{/if}
+									{booticon iname="icon-ok"  ipackage="icons"  iexplain="Active Scheme"}
 									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?apply_style={$name}">{$name}</a>
 									&nbsp; <a href="{$file.url}">{booticon iname="icon-search"  ipackage=icons  iexplain="View Source"}</a>
 									&nbsp; <a href="{$smarty.const.CASCADER_PKG_URL}index.php?remove_style={$name}">{booticon iname="icon-trash"  ipackage=icons  iexplain="Remove File"}</a>
