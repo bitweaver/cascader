@@ -49,7 +49,7 @@
 				<input type="hidden" name="month" value="{$smarty.request.month}" />
 				<input type="hidden" name="year" value="{$smarty.request.year}" />
 				<p>You are currently not using the cascader style. If you don't get the desired effects when applying a new color style, please switch to the cascader site style.</p>
-				<div class="control-group submit">
+				<div class="form-group submit">
 					<input type="submit" class="btn btn-default" name="cascader_style" value="Apply Cascader Style" />
 				</div>
 			{/form}
@@ -121,7 +121,7 @@
 							</tr>
 						</table>
 
-						<div class="control-group submit">
+						<div class="form-group submit">
 							<input type="submit" class="btn btn-default" name="clear_style" value="{tr}Clear Style{/tr}" />
 							<input type="submit" class="btn btn-default" name="create_style" value="{tr}Create / Update Style{/tr}" />
 						</div>
@@ -146,7 +146,7 @@
 							{/foreach}
 						</ul>
 
-						<div class="control-group submit">
+						<div class="form-group submit">
 							<input type="submit" class="btn btn-default" name="clear_all_styles" value="{tr}Remove all schemes{/tr}" />
 						</div>
 					{/form}
